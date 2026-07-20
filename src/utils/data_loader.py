@@ -49,9 +49,9 @@ class DataLoader(data.Dataset):
         
 
         small_split_to_file = {
-            "Train": [f"./Rupture_Comportement/Age_Estimation/data/train-{dataset}.csv"],
-            "Test": [f"./Rupture_Comportement/Age_Estimation/data/test-{dataset}.csv"],
-            "Val": [f"./Rupture_Comportement/Age_Estimation/data/val-{dataset}.csv"],
+            "Train": [f"./data/train-{dataset}.csv"],
+            "Test": [f"./data/test-{dataset}.csv"],
+            "Val": [f"./data/val-{dataset}.csv"],
         }
 
         return small_split_to_file[split]

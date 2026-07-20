@@ -6,11 +6,11 @@ import subprocess
 
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from Age_Estimation.src.utils.parsing_utils import *
+from src.utils.parsing_utils import *
 
 
 def build_parser():

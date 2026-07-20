@@ -73,12 +73,12 @@ class InvertedResidual(nn.Module):
         else:
             return self.conv(x)
 
-class MobileFaceNet(nn.Module):
+class MobileFaceNetClass(nn.Module):
     """
     MobileFaceNet adapted for Age Estimation.
     """
-    def __init__(self, width_mult=1.0, inverted_residual_setting=None, round_nearest=8, num_outputs=1, dropout_rate=0.3):
-        super(MobileFaceNet, self).__init__()
+    def __init__(self, num_outputs=1, in_channels=1, width_mult=1.0, inverted_residual_setting=None, round_nearest=8, dropout_rate=0.3):
+        super(MobileFaceNetClass, self).__init__()
         block = InvertedResidual
         input_channel = 64
         last_channel = 512
@@ -95,7 +95,7 @@ class MobileFaceNet(nn.Module):
 
         self.last_channel = _make_divisible(last_channel * max(1.0, width_mult), round_nearest)
         
-        self.conv1 = ConvBNReLU(1, input_channel, stride=1) 
+        self.conv1 = ConvBNReLU(in_channels, input_channel, stride=1) 
         
         self.dw_conv = DepthwiseSeparableConv(in_planes=64, out_planes=64, kernel_size=3, padding=1)
         
@@ -154,6 +154,16 @@ class MobileFaceNet(nn.Module):
         x = x.view(x.size(0), -1) # Flatten (Batch, 128)
         
         return self.regression_head(x)
+
+
+def MobileFaceNet(num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.3, freezed: bool = False) -> nn.Module:
+    model = MobileFaceNetClass(num_outputs=num_outputs, in_channels=num_channels, dropout_rate=dropout_rate)
+    if freezed:
+        for param in model.parameters():
+            param.requires_grad = False
+        for param in model.regression_head.parameters():
+            param.requires_grad = True 
+    return model
 
 
 if __name__ == "__main__":

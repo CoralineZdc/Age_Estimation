@@ -3,12 +3,9 @@ import torch.nn as nn
 from efficientnet_pytorch import EfficientNet 
 
 class EfficientNetClass(nn.Module):
-    def __init__(self, in_channels: int =1, dropout_rate: int =0.3, pretrained: bool =False):
+    def __init__(self, in_channels: int =1, dropout_rate: float =0.3):
         super(EfficientNetClass, self).__init__()
-        if pretrained:
-            self.backbone = EfficientNet.from_pretrained('efficientnet-b0', in_channels=in_channels)  # Assuming grayscale images; change to 3 for RGB
-        else:
-            self.backbone = EfficientNet.from_name('efficientnet-b0', in_channels=in_channels)  # Assuming grayscale images; change to 3 for RGB
+        self.backbone = EfficientNet.from_name('efficientnet-b0', in_channels=in_channels)  # Assuming grayscale images; change to 3 for RGB
 
         # Replace the classification head with a regression head for age estimation
         in_features = self.backbone._fc.in_features
@@ -26,8 +23,8 @@ class EfficientNetClass(nn.Module):
         features = self.backbone(x)
         return self.regression_head(features)
     
-def EfficientNetModel(in_channels: int =1, dropout_rate: int =0.3, pretrained: bool =False, freezed: bool =False) -> nn.Module:
-    model = EfficientNetClass(in_channels=in_channels, dropout_rate=dropout_rate, pretrained=pretrained)
+def EfficientNetModel(in_channels: int =1, dropout_rate: float = 0.3, pretrained: bool =False, freezed: bool =False) -> nn.Module:
+    model = EfficientNetClass(in_channels=in_channels, dropout_rate=dropout_rate)
 
     if freezed:
         for param in model.parameters():

@@ -21,17 +21,20 @@ The datasets used for training are UTK-Face, AgeDB and IMDB-Wiki.
 
 ## Datasets
 
-- AgeDB
-Source: Moschoglou, S., Papaioannou, A., Sagonas, C., Deng, J., Kotsia, I., & Zafeirou, S. (2017). Agedb: the first manually collected, in-the-wild age database, In *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshop*(pp. 51-59)
-Available at: [https://ibug.doc.ic.ac.uk/resources/agedb/](https://ibug.doc.ic.ac.uk/resources/agedb/)
-Licence: Available for non-commercial research purposes only
+### AgeDB
 
-- UTKFace 
-Source: Zhifei, Z., Yang, S., & Qi, H. (2017). Age Progression/Regression by Conditional Adversarial Autoencoder. In *IEEE Conference on Computer Vision and Pattern Recognition* (pp.5810-5818)
-Available at: [https://susanqq.github.io/UTKFace/](https://susanqq.github.io/UTKFace/)
-Licence: Available for non-commercial research purposes only
+- Source: Moschoglou, S., Papaioannou, A., Sagonas, C., Deng, J., Kotsia, I., & Zafeirou, S. (2017). Agedb: the first manually collected, in-the-wild age database, In *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshop*(pp. 51-59)
+- Available at: [https://ibug.doc.ic.ac.uk/resources/agedb/](https://ibug.doc.ic.ac.uk/resources/agedb/)
+- Licence: Available for non-commercial research purposes only
 
-- IMDb-Wiki
-Source: Rothe, R., Timofte, R., & Van Gool, L. (2018). Deep expectation of real and apparent age from a single image without facial landmarks. *International Journal of Computer Vision, 126(2)*, 144-157.
-Available at: [https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/](https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/)
-Licence: Available for academic research purposes only
+### UTKFace
+
+- Source: Zhifei, Z., Yang, S., & Qi, H. (2017). Age Progression/Regression by Conditional Adversarial Autoencoder. In *IEEE Conference on Computer Vision and Pattern Recognition* (pp.5810-5818)
+- Available at: [https://susanqq.github.io/UTKFace/](https://susanqq.github.io/UTKFace/)
+- Licence: Available for non-commercial research purposes only
+
+### IMDb-Wiki
+
+- Source: Rothe, R., Timofte, R., & Van Gool, L. (2018). Deep expectation of real and apparent age from a single image without facial landmarks. *International Journal of Computer Vision, 126(2)*, 144-157.
+- Available at: [https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/](https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/)
+- Licence: Available for academic research purposes only

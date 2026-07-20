@@ -9,13 +9,13 @@ import optuna
 import sys
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from Age_Estimation.src.utils.training_utils import set_seed, clip_gradient
-from Age_Estimation.src.utils.data_loader import DataLoader
-from Age_Estimation.src.transforms import transforms 
+from src.utils.training_utils import *
+from src.utils.data_loader import DataLoader
+from src.transforms import transforms 
 
 
 def save_checkpoint(state, filename):
@@ -117,12 +117,34 @@ def run_training(opt, trial=None):
     path = os.path.join(opt.output_dir, folder_name)
     os.makedirs(path, exist_ok=True)
 
+
+    num_channels = 3 if opt.pretrained and opt.model != "efficientnet" else 1
+    model = load_model(opt.model, num_channels=num_channels, num_outputs=opt.num_outputs, dropout_rate=opt.dropout_rate, freezed=opt.freezed)
+    
+    pretrain_dataset_name = None
+    if opt.pretrained:
+        model, pretrain_dataset_name = load_pretrained_weights(model, opt.model)
+        print(f"Loaded pretrained weights for {opt.model} trained on {pretrain_dataset_name} dataset.")
+
+    normalization_mean, normalization_std = None, None
+    if pretrain_dataset_name == "ms1m":
+        input_size = 112
+        normalization_mean = [0.5] * num_channels
+        normalization_std = [0.5] * num_channels
+    elif pretrain_dataset_name == "vggface":
+        input_size = 224
+        normalization_mean = [0.5] * num_channels
+        normalization_std = [0.5] * num_channels
+
     if data_augmentation:
         transform_list = [
+            transforms.GrayScale(num_output_channels=3) if opt.pretrained and opt.model != "efficientnet" else lambda x: x,
+            transforms.Resize((input_size, input_size)),
             transforms.RandomResizedCrop(input_size, scale=(1-scale, 1+scale), ratio=(1.0, 1.0)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(degrees=rotation),
             transforms.RandomShift(shift_range=(hor_shift, ver_shift)),
+            transforms.Normalize(mean=normalization_mean, std=normalization_std) if normalization_mean and normalization_std else lambda x: x,
             transforms.ToTensor()
         ]
 
@@ -130,11 +152,15 @@ def run_training(opt, trial=None):
     else:
         train_transform = transforms.Compose([
             transforms.Resize((input_size, input_size)),
+            transforms.GrayScale(num_output_channels=3) if opt.pretrained and opt.model != "efficientnet" else lambda x: x,
+            transforms.Normalize(mean=normalization_mean, std=normalization_std) if normalization_mean and normalization_std else lambda x: x,
             transforms.ToTensor()
         ])
 
     val_transform = transforms.Compose([
         transforms.Resize((input_size, input_size)),
+            transforms.GrayScale(num_output_channels=3) if opt.pretrained and opt.model != "efficientnet" else lambda x: x,
+        transforms.Normalize(mean=normalization_mean, std=normalization_std) if normalization_mean and normalization_std else lambda x: x,
         transforms.ToTensor()
     ])
 
@@ -144,24 +170,7 @@ def run_training(opt, trial=None):
     val_dataset = DataLoader(dataset=opt.dataset, split="Val", transform=val_transform)
     valloader = torch.utils.data.DataLoader(val_dataset, batch_size=opt.batch_size, shuffle=False, num_workers=4)
 
-    if opt.model == "vgg16":
-        from Age_Estimation.models.vgg import VGG16
-        model = VGG16(num_outputs=opt.num_outputs, dropout_rate=opt.dropout_rate, pretrained=opt.pretrained, freezed=opt.freezed)
-    elif opt.model == "vgg19":
-        from Age_Estimation.models.vgg import VGG19
-        model = VGG19(num_outputs=opt.num_outputs, dropout_rate=opt.dropout_rate, pretrained=opt.pretrained, freezed=opt.freezed)
-    elif opt.model == "resnet18":
-        from Age_Estimation.models.resnet import ResNet18
-        model = ResNet18(dropout_rate=opt.dropout_rate, pretrained=opt.pretrained, freezed=opt.freezed)
-    elif opt.model == "efficientnet":
-        from Age_Estimation.models.efficientnet import EfficientNetModel
-        model = EfficientNetModel(dropout_rate=opt.dropout_rate, pretrained=opt.pretrained, freezed=opt.freezed)
-    elif opt.model == "mobilenet":
-        from Age_Estimation.models.mobilenet import MobileNet
-        model = MobileNet(num_outputs=opt.num_outputs, dropout_rate=opt.dropout_rate, pretrained=opt.pretrained, freezed=opt.freezed)
-    else:
-        raise ValueError("Unsupported model architecture: {}".format(opt.model))
-    
+
     print(
         "Model: {}".format(
             opt.model.upper()
@@ -288,7 +297,7 @@ def build_parser():
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
     parser.add_argument("--epochs", type=int, default=100, help="Number of epochs to train (default: 100)")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate for the optimizer (default: 0.001)")
-    parser.add_argument("--model", type=str, default="vgg16", choices=["vgg16", "vgg19", "resnet18", "efficientnet", "mobilenet"], help="Model architecture to use (default: vgg16)")
+    parser.add_argument("--model", type=str, default="vgg16", choices=["vgg11", "vgg13", "vgg16", "vgg19", "resnet18", "resnet34", "resnet50", "efficientnet", "mobilenet", "mobilefacenet"], help="Model architecture to use (default: vgg16)")
     parser.add_argument("--pretrained", action="store_true", help="Use pretrained weights for the model")
     parser.add_argument("--freezed", action="store_true", help="Freeze the convolutional layers of the model")
     parser.add_argument("--num_outputs", type=int, default=1, help="Number of outputs for the regression head (default: 1)")

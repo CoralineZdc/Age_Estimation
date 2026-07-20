@@ -12,7 +12,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_
 if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
     sys.path.insert(0, project_root)
 
-from Age_Estimation.src.transforms import functional 
+from src.transforms import functional 
 
 
 class Compose(object):
@@ -282,3 +282,55 @@ class RandomShift(object):
         shift_x = random.randint(-max_shift_x, max_shift_x)
         shift_y = random.randint(-max_shift_y, max_shift_y)
         return functional.shift(img, shift_x, shift_y)
+    
+
+class Normalize(object):
+    """Normalize a tensor image with mean and standard deviation.
+
+    Given mean: (M1,...,Mn) and std: (S1,..,Sn) for n channels, this transform
+    will normalize each channel of the input torch.*Tensor i.e.
+    input[channel] = (input[channel] - mean[channel]) / std[channel]
+
+    Args:
+        mean (sequence): Sequence of means for each channel.
+        std (sequence): Sequence of standard deviations for each channel.
+    """
+
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+
+        Returns:
+            Tensor: Normalized image.
+        """
+        return functional.normalize(tensor, self.mean, self.std)
+    
+
+class GrayScale(object):
+    """Convert a PIL Image to grayscale.
+
+    This transform converts a PIL Image to grayscale by averaging the RGB channels.
+    The output image will have a single channel.
+
+    Args:
+        num_output_channels (int): Number of channels desired for the output image.
+            1 for single channel grayscale, 3 for 3-channel grayscale (default: 1).
+    """
+
+    def __init__(self, num_output_channels=1):
+        self.num_output_channels = num_output_channels
+
+    def __call__(self, img):
+        """
+        Args:
+            img (PIL Image): Image to be converted to grayscale.
+
+        Returns:
+            PIL Image: Grayscale image.
+        """
+        return functional.to_grayscale(img, num_output_channels=self.num_output_channels)

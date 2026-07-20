@@ -60,7 +60,13 @@ def to_tensor(pic):
     else:
         buffer = np.frombuffer(pic.tobytes(), dtype=np.uint8)
         buffer_copy = buffer.copy()
-        img = torch.ByteTensor(buffer_copy).view(pic.size[1], pic.size[0])
+        if pic.mode == 'YCbCr':
+            nchannel = 3
+        elif pic.mode == 'I;16':
+            nchannel = 1
+        else:
+            nchannel = len(pic.mode)
+        img = torch.ByteTensor(buffer_copy).view(pic.size[1], pic.size[0], nchannel)
         #img = torch.ByteTensor(torch.ByteStorage.from_buffer(pic.tobytes())).untyped_storage()
 
     # PIL image mode: 1, L, P, I, F, RGB, YCbCr, RGBA, CMYK
@@ -70,7 +76,8 @@ def to_tensor(pic):
         nchannel = 1
     else:
         nchannel = len(pic.mode)
-    img = img.view(pic.size[1], pic.size[0], nchannel)
+    if img.ndimension() == 2:
+        img = img.view(pic.size[1], pic.size[0], nchannel)
     # put it from HWC to CHW format
     # yikes, this transpose takes 80% of the loading time/CPU
     img = img.transpose(0, 1).transpose(0, 2).contiguous()
@@ -315,3 +322,64 @@ def shift(img, x_shift, y_shift):
     return ImageChops.offset(img, x_shift, y_shift)
 
 
+def normalize(img, mean, std, inplace=False):
+    """Normalize a tensor image with mean and standard deviation.
+
+    .. note::
+        This transform acts out of place by default, i.e., it does not mutates the input tensor.
+
+    See :class:`~torchvision.transforms.Normalize` for more details.
+
+    Args:
+        tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+        mean (sequence): Sequence of means for each channel.
+        std (sequence): Sequence of standard deviations for each channel.
+        inplace(bool, optional): Bool to make this operation in-place.
+
+    Returns:
+        Tensor: Normalized Tensor image.
+    """
+
+    tensor = to_tensor(img)
+    if not torch.is_tensor(tensor):
+        raise TypeError('tensor should be a torch tensor. Got {}'.format(type(tensor)))
+
+    if not inplace:
+        tensor = tensor.clone()
+
+    dtype = tensor.dtype
+    mean = torch.as_tensor(mean, dtype=dtype, device=tensor.device)
+    std = torch.as_tensor(std, dtype=dtype, device=tensor.device)
+    if (std == 0).any():
+        raise ValueError('std evaluated to zero after conversion to {}, leading to division by zero.'.format(dtype))
+
+    if mean.ndim == 1:
+        mean = mean.view(-1, 1, 1)
+    if std.ndim == 1:
+        std = std.view(-1, 1, 1)
+    tensor.sub_(mean).div_(std)
+    return to_pil_image(tensor)
+
+
+def to_grayscale(img, num_output_channels=1):
+    """Convert image to grayscale.
+
+    Args:
+        img (PIL Image): Image to be converted to grayscale.
+        num_output_channels (int): Number of channels desired for output image.
+            1 or 3. Default: 1.
+
+    Returns:
+        PIL Image: Grayscale version of the input image.
+    """
+    if not _is_pil_image(img):
+        raise TypeError('img should be PIL Image. Got {}'.format(type(img)))
+
+    if num_output_channels == 1:
+        img = img.convert('L')
+    elif num_output_channels == 3:
+        img = img.convert('RGB')
+    else:
+        raise ValueError('num_output_channels should be either 1 or 3')
+
+    return img

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models 
 
-def build_model(model_name: str, num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.0, pretrained: bool = False, freezed: bool = False) -> nn.Module:
+def build_model(model_name: str, num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.0, freezed: bool = False) -> nn.Module:
     """
     Constructs a ResNet model with a regression head for age estimation.
     The model consists of convolutional blocks followed by fully connected layers.
@@ -16,11 +16,11 @@ def build_model(model_name: str, num_channels: int = 1, num_outputs: int = 1, dr
         dropout_rate (float): Dropout rate for regularization (default: 0.0).
     """
     if model_name == "resnet18":
-        model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
+        model = models.resnet18(weights=None)
     elif model_name == "resnet34":
-        model = models.resnet34(weights=models.ResNet34_Weights.IMAGENET1K_V1 if pretrained else None)
+        model = models.resnet34(weights=None)
     elif model_name == "resnet50":
-        model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1 if pretrained else None)
+        model = models.resnet50(weights=None)
     else:
         raise ValueError(f"Unsupported model name: {model_name}. Supported models are 'resnet18', 'resnet34', and 'resnet50'.")
 
@@ -50,15 +50,15 @@ def build_model(model_name: str, num_channels: int = 1, num_outputs: int = 1, dr
 
 
 def ResNet18(num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.0, pretrained: bool = False, freezed: bool = False) -> nn.Module:
-    return build_model("resnet18", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, pretrained=pretrained, freezed=freezed)
+    return build_model("resnet18", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, freezed=freezed)
 
 
 def ResNet34(num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.0, pretrained: bool = False, freezed: bool = False) -> nn.Module:
-    return build_model("resnet34", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, pretrained=pretrained, freezed=freezed)
+    return build_model("resnet34", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, freezed=freezed)
 
 
 def ResNet50(num_channels: int = 1, num_outputs: int = 1, dropout_rate: float = 0.0, pretrained: bool = False, freezed: bool = False) -> nn.Module:
-    return build_model("resnet50", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, pretrained=pretrained, freezed=freezed)
+    return build_model("resnet50", num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, freezed=freezed)
 
 """
 class RegressionHead(nn.Module):
