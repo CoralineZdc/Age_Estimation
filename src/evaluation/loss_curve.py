@@ -104,7 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dir",
         type=str,
-        default="./output/vgg16/seed42_lr0.0001_bs40_data-aug",
+        required=True,
         help="Directory containing log csv files and where the loss curve images will be saved.",
     )
     return parser

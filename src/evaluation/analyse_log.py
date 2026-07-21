@@ -1,1 +1,2 @@
-def read_log(path: Path)
+def read_log(path: Path):
+    pass

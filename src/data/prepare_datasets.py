@@ -322,7 +322,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare dataset for age estimation.")
     parser.add_argument("--dataset", type=str, default="AgeDB", choices=["all", "AgeDB", "UTKFace", "Wiki", "IMDb"], help="Dataset to prepare (default: AgeDB)")
     parser.add_argument("--size", type=int, default=224, help="Size to which images will be resized (default: 48)")
-    parser.add_argument("--data_dir", type=str, default="../Data/Age", help="Path to the data directory containing AgeDB (default: ../Data/Age)")
+    parser.add_argument("--data_dir", type=str, required=True, help="Path to the data directory containing AgeDB (default: ../Data/Age)")
     parser.add_argument("--output_dir", type=str, default="./data", help="Path to the output directory for processed CSVs (default: ./data)")
     parser.add_argument("--dry_run", action="store_true", help="If set, will not write files but will log actions (default: False)")
     parser.add_argument("--children", action="store_true", help="If set, will only process images of children (ages 0-16) (default: False)")
