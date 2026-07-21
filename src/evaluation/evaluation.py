@@ -6,12 +6,12 @@ import torch
 import argparse
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from Age_Estimation.src.utils.data_loader import DataLoader
-from Age_Estimation.src.transforms import transforms 
+from src.utils.data_loader import DataLoader
+from src.transforms import transforms 
 
 def repo_root() -> str:
     return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -27,19 +27,19 @@ def get_model_class(model_name):
         The model class corresponding to the given model name.
     """
     if model_name == "vgg16":
-        from Age_Estimation.models.vgg import VGG16
+        from models.vgg import VGG16
         return VGG16
     elif model_name == "vgg19":
-        from Age_Estimation.models.vgg import VGG19
+        from models.vgg import VGG19
         return VGG19
     elif model_name == "resnet18":
-        from Age_Estimation.models.resnet import ResNet18
+        from models.resnet import ResNet18
         return ResNet18
     elif model_name == "efficientnet":
-        from Age_Estimation.models.efficientnet import EfficientNetModel
+        from models.efficientnet import EfficientNetModel
         return EfficientNetModel
     elif model_name == "mobilefacenet":
-        from Age_Estimation.models.mobilefacenet import MobileFaceNet
+        from models.mobilefacenet import MobileFaceNet
         return MobileFaceNet
     else:
         raise ValueError("Unsupported model architecture: {}".format(model_name))

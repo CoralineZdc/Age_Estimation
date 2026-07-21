@@ -19,7 +19,7 @@ def build_parser():
     parser.add_argument("--n_trials", type=int, default=50, help="Number of trials for Optuna optimization.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
     parser.add_argument("--datasets", type=parse_csv_strings, default="agedb,utkface,wiki,imdb", help="Comma-separated list of datasets to run Optuna on.")
-    parser.add_argument("--training_mode", type=parse_csv_strings, default="freezed,unfreezed", help="Comma-separated list of training modes to run Optuna on.")
+    parser.add_argument("--training_mode", type=parse_csv_bool_tuples, default="(0,0);(1,1);(0,1)", help="semi-colon-separated list of training modes (tuples of boolean values) to run Optuna on.")
     parser.add_argument("--output_dir", type=str, default=os.path.join(repo_root(), "output"), help="Directory to save Optuna results.")   
     parser.add_argument("--models", type=str, default="vgg16,vgg19,resnet18,efficientnet,mobilenet", help="Comma-separated list of models to include in the optimization.")
     parser.add_argument("--learning_rate_range", type=str, default="1e-5,1e-2", help="Learning rate range for optimization (min,max).")
@@ -60,10 +60,13 @@ if __name__ == "__main__":
     print(f"Explored trials: {explored_trials}")
     for dataset in dataset_list:
         for mode in training_mode:
+            pretrained, freezed = mode
+            pretrained_str = "pretrained" if pretrained else "scratch"
+            freezed_str = "freezed" if freezed else "unfreezed"
             if (dataset, mode) in explored_trials:
-                print(f"Skipping dataset: {dataset}, training mode: {mode}")
+                print(f"Skipping dataset: {dataset}, training mode: {pretrained_str}_{freezed_str} (already explored)")
                 continue
-            print(f"Running Optuna on dataset: {dataset}, training mode: {mode}")
+            print(f"Running Optuna on dataset: {dataset}, training mode: {pretrained_str}_{freezed_str}")
             
 
             command = [
@@ -72,7 +75,7 @@ if __name__ == "__main__":
                 "--n_trials", str(args.n_trials),
                 "--seed", str(args.seed),
                 "--output_dir", args.output_dir,
-                "--log_name", f"log_{dataset}_{mode}.csv",
+                "--log_name", f"log_{dataset}_{pretrained_str}_{freezed_str}.csv",
                 "--models", args.models,
                 "--datasets", f"{dataset}48,{dataset}224",
                 "--learning_rate_range", args.learning_rate_range,
@@ -89,9 +92,10 @@ if __name__ == "__main__":
                 "--lr_min", str(args.lr_min),
                 "--lr_threshold_mode", args.lr_threshold_mode
             ]
-            if mode == "freezed":
-                command.append("--pretrained")
+            if freezed:
                 command.append("--freezed")
-            
+            if pretrained:
+                command.append("--pretrained")
+
             subprocess.run(command)
     

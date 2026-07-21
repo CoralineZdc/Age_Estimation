@@ -10,7 +10,7 @@ if project_root not in sys.path and os.path.exists(os.path.join(project_root, "A
     sys.path.insert(0, project_root)
 project_root = os.path.join(project_root, "Age_Estimation")
 
-from Age_Estimation.src.utils.parsing_utils import *
+from src.utils.parsing_utils import *
 
 
 def get_dataset_paths(data_dir, dataset_names, image_size, population, split="train"):

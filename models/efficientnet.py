@@ -23,7 +23,7 @@ class EfficientNetClass(nn.Module):
         features = self.backbone(x)
         return self.regression_head(features)
     
-def EfficientNetModel(in_channels: int =1, dropout_rate: float = 0.3, pretrained: bool =False, freezed: bool =False) -> nn.Module:
+def EfficientNetModel(in_channels: int =1, dropout_rate: float = 0.3, freezed: bool =False) -> nn.Module:
     model = EfficientNetClass(in_channels=in_channels, dropout_rate=dropout_rate)
 
     if freezed:

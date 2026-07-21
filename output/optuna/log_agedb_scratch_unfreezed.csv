@@ -1,0 +1,2 @@
+number,value,datetime_start,datetime_complete,duration,state,params_batch_size,params_data_augmentation_param,params_dataset,params_dropout_rate,params_learning_rate,params_lr-threshold,params_lr_factor,params_lr_patience,params_model,params_optimizer
+0,15.142461292779268,2026-07-21 08:32:53.256890,2026-07-21 09:09:44.134147,0 days 00:36:50.877257,COMPLETE,48,3,agedb224,0.37599561277849247,0.004553105159890906,5.941785763062066e-05,0.23919699709635267,7,vgg16,adamw

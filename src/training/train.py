@@ -293,7 +293,7 @@ def build_parser():
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     parser.add_argument("--dataset", type=str, default="agedb224", choices=["agedb224", "agedb48", "utkface224", "utkface48", "imdb224", "imdb48", "wiki224", "wiki48"], help="Dataset name (default: agedb)")
     parser.add_argument("--early_stopping_patience", type=int, default=20, help="Number of epochs to wait for improvement before early stopping")
-    parser.add_argument("--output_dir", type=str, default="./Rupture_Comportement/Age_Estimation/output", help="Directory to save checkpoints and logs")
+    parser.add_argument("--output_dir", type=str, default="./output", help="Directory to save checkpoints and logs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
     parser.add_argument("--epochs", type=int, default=100, help="Number of epochs to train (default: 100)")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate for the optimizer (default: 0.001)")
