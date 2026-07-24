@@ -4,11 +4,10 @@ import os
 import torch
 import argparse
 import shutil
-import random
 import numpy as np
 from types import SimpleNamespace
 
-from train import run_training
+from src.training.train import run_training
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

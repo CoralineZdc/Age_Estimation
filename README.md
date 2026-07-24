@@ -16,7 +16,7 @@ python -m pip install -r requirements.txt
 Convert the Datasets as saved from the links in the "Datasets" section to CSVs:
 
 ```bash
-python src/data/prepare_datasets.py --data_dir /Path/To/Data
+python -m src.data.prepare.datasets --data_dir /Path/To/Data
 ```
 
 Options:
@@ -36,7 +36,7 @@ Options:
 3.Train a single model:
 
 ```bash
-python src/training/train.py
+python -m src.training.train
 ```
 
 Options:
@@ -89,7 +89,7 @@ Options:
 4.Optimize hyperparameters with Optuna
 
 ```bash
-python src/training/run_optuna.py
+python src.training.run_optuna
 ```
 
 Options:

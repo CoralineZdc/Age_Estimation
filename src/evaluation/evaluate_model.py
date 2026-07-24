@@ -12,59 +12,9 @@ if project_root not in sys.path:
 
 from src.utils.data_loader import DataLoader
 from src.transforms import transforms 
+from src.utils.parsing_utils import repo_root, get_simu_params
+from src.utils.training_utils import load_model
 
-def repo_root() -> str:
-    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-def get_model_class(model_name):
-    """
-    Get the model class based on the model name.
-
-    Args:
-        model_name: The name of the model.
-
-    Returns:
-        The model class corresponding to the given model name.
-    """
-    if model_name == "vgg16":
-        from models.vgg import VGG16
-        return VGG16
-    elif model_name == "vgg19":
-        from models.vgg import VGG19
-        return VGG19
-    elif model_name == "resnet18":
-        from models.resnet import ResNet18
-        return ResNet18
-    elif model_name == "efficientnet":
-        from models.efficientnet import EfficientNetModel
-        return EfficientNetModel
-    elif model_name == "mobilefacenet":
-        from models.mobilefacenet import MobileFaceNet
-        return MobileFaceNet
-    else:
-        raise ValueError("Unsupported model architecture: {}".format(model_name))
-
-def get_simu_params(state_dict_path):
-    """
-    Extract simulation parameters from the state dictionary path.
-
-    Args:
-        state_dict_path: Path to the state dictionary file.
-    Returns:
-        A dictionary containing the extracted simulation parameters.
-    """
-    dir_name = os.path.dirname(state_dict_path)
-    dir_name = dir_name.split("/")[-1]  # Get the last part of the path
-    params_list = dir_name.split("_")  # Split by underscores
-    params = {}
-    for param in params_list:
-        for id_char in range(len(param)):
-            if param[id_char].isdigit():
-                break
-        key = param[:id_char]
-        value = param[id_char:]
-        params[key] = value
-    return params
 
 def build_model_from_state_dict(model_name, dropout_rate, state_dict_path, device):
     """
@@ -80,7 +30,7 @@ def build_model_from_state_dict(model_name, dropout_rate, state_dict_path, devic
     state_dict = torch.load(state_dict_path, map_location=device)
 
     # Create an instance of the model class
-    model_class = get_model_class(model_name)
+    model_class = load_model(model_name)
     model = model_class(dropout_rate=dropout_rate)
 
     try :

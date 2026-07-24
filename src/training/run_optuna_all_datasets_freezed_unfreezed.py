@@ -1,14 +1,7 @@
 import sys
 import os
 import argparse
-from types import SimpleNamespace
 import subprocess
-
-
-# Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
 
 from src.utils.parsing_utils import *
 

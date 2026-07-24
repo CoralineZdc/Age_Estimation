@@ -4,6 +4,9 @@ import torch
 import os
 import onnx2pytorch
 import onnx
+import re
+
+from models import resnet, vgg, mobilenet, mobilefacenet, efficientnet
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -61,36 +64,30 @@ def load_pretrained_weights(model, model_name):
 
 
 def load_model(model_name, num_channels=1, num_outputs=1, dropout_rate=0.3, freezed=False):
-    if model_name == "vgg11":
-        from models.vgg import VGG11
-        model = VGG11(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "vgg13":
-        from models.vgg import VGG13
-        model = VGG13(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "vgg16":
-        from models.vgg import VGG16
-        model = VGG16(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "vgg19":
-        from models.vgg import VGG19
-        model = VGG19(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "resnet34":
-        from models.resnet import ResNet34
-        model = ResNet34(num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "resnet50":
-        from models.resnet import ResNet50
-        model = ResNet50(num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "resnet18":
-        from models.resnet import ResNet18
-        model = ResNet18(num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "efficientnet":
-        from models.efficientnet import EfficientNetModel
-        model = EfficientNetModel(dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "mobilenet":
-        from models.mobilenet import MobileNet
-        model = MobileNet(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
-    elif model_name == "mobilefacenet":
-        from models.mobilefacenet import MobileFaceNet
-        model = MobileFaceNet(num_outputs=num_outputs, num_channels=num_channels, dropout_rate=dropout_rate, freezed=freezed)
+    MODEL_CLASSES = {
+        "resnet": resnet.ResNetRegression,
+        "vgg": vgg.VGGRegression,
+        "mobilenet": mobilenet.MobileNet,
+        "mobilefacenet": mobilefacenet.MobileFaceNet,
+        "efficientnet": efficientnet.EfficientNetB0
+    }
+
+    if "resnet" in model_name or "vgg" in model_name:
+        model_name_letters = re.findall(r'[a-zA-Z]+', model_name)
+        model_class = MODEL_CLASSES.get(model_name_letters[0], None)
+        if model_class is None:
+            raise ValueError(f"Unsupported model architecture: {model_name}")
+        model = model_class(model_name=model_name, num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, freezed=freezed)
+    elif model_name in MODEL_CLASSES:
+        model_class = MODEL_CLASSES[model_name]
+        model = model_class(num_channels=num_channels, num_outputs=num_outputs, dropout_rate=dropout_rate, freezed=freezed)
     else:
-        raise ValueError("Unsupported model architecture: {}".format(model_name))
+        raise ValueError(f"Unsupported model architecture: {model_name}")
+
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"Trainable params: {trainable_params} / {total_params}")
+    if trainable_params == 0:
+        print("ERROR: No trainable parameters! Check freeze_backbone logic.")
+
     return model

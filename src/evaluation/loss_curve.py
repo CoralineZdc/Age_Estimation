@@ -9,9 +9,11 @@ import matplotlib.pyplot as plt
 
 
 # Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+from src.utils.parsing_utils import repo_root
     
 
 def plot_loss_curve(csv_path: Path, output_dir: Path) -> Path:
@@ -60,9 +62,6 @@ def plot_loss_curve(csv_path: Path, output_dir: Path) -> Path:
 
     return output_file
 
-
-def repo_root() -> str:
-    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def discover_csvs(dir: Path) -> list[Path]:
     return sorted(

@@ -6,13 +6,6 @@ import torch
 import csv
 import optuna
 
-import sys
-
-# Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
 from src.utils.training_utils import *
 from src.utils.data_loader import DataLoader
 from src.transforms import transforms 

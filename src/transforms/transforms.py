@@ -1,16 +1,9 @@
 import numbers
-import os
-import sys
 import numpy as np
 import random
 from PIL import Image
 import math
 from collections.abc import Iterable
-
-# Navigate UP 3 levels: training -> src -> Age_Estimation
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-if project_root not in sys.path and os.path.exists(os.path.join(project_root, "Age_Estimation")):
-    sys.path.insert(0, project_root)
 
 from src.transforms import functional 
 
